@@ -1,13 +1,4 @@
 .env
-.git
-.gitignore
-.gitattributes
-.editorconfig
-.npmrc
-composer.lock
-phpunit.xml
-README.md
-tests
 database/*.sqlite
 storage/app
 storage/framework/cache

@@ -5,8 +5,25 @@ use Illuminate\Http\Request;
 define('LARAVEL_START', microtime(true));
 
 if (getenv('VERCEL_ENV')) {
-    $storagePath = sys_get_temp_dir() . '/laravel-storage';
+    $tmpDir = sys_get_temp_dir();
+    $storagePath = $tmpDir . '/laravel-storage';
 
+    // Redirect all Laravel cache / compiled paths to /tmp
+    putenv('APP_CONFIG_CACHE=' . $tmpDir . '/config.php');
+    putenv('APP_EVENTS_CACHE=' . $tmpDir . '/events.php');
+    putenv('APP_PACKAGES_CACHE=' . $tmpDir . '/packages.php');
+    putenv('APP_ROUTES_CACHE=' . $tmpDir . '/routes.php');
+    putenv('APP_SERVICES_CACHE=' . $tmpDir . '/services.php');
+    putenv('VIEW_COMPILED_PATH=' . $storagePath . '/framework/views');
+
+    // SQLite database di /tmp
+    $dbPath = $tmpDir . '/database.sqlite';
+    if (!file_exists($dbPath)) {
+        touch($dbPath);
+    }
+    putenv('DB_DATABASE=' . $dbPath);
+
+    // Buat direktori storage di /tmp
     $dirs = [
         'app/public',
         'framework/cache/data',
@@ -23,12 +40,11 @@ if (getenv('VERCEL_ENV')) {
         }
     }
 
-    // Override env for SQLite database on Vercel
-    $dbPath = sys_get_temp_dir() . '/database.sqlite';
-    if (!file_exists($dbPath)) {
-        touch($dbPath);
+    // Pastikan storage symlink target exists
+    $publicStorage = $storagePath . '/app/public';
+    if (!is_dir($publicStorage)) {
+        mkdir($publicStorage, 0755, true);
     }
-    putenv('DB_DATABASE=' . $dbPath);
 }
 
 if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php')) {
