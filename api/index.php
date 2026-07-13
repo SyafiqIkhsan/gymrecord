@@ -57,11 +57,21 @@ try {
 
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-    if (isset($storagePath)) {
-        $app->useStoragePath($storagePath);
-    }
+if (isset($storagePath)) {
+    $app->useStoragePath($storagePath);
+}
 
-    $app->handleRequest(Request::capture());
+// Auto-run migrations on Vercel jika tabel belum ada
+if (getenv('VERCEL')) {
+    try {
+        $artisan = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+        $artisan->call('migrate', ['--force' => true]);
+    } catch (\Throwable $e) {
+        error_log('Auto-migrate error: ' . $e->getMessage());
+    }
+}
+
+$app->handleRequest(Request::capture());
 } catch (Throwable $e) {
     error_log('Laravel 500: ' . (string) $e);
 
