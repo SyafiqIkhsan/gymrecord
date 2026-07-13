@@ -52,4 +52,14 @@ if (isset($storagePath)) {
     $app->useStoragePath($storagePath);
 }
 
-echo "Laravel booted successfully\n";
+echo "Before handleRequest\n";
+
+use Illuminate\Http\Request;
+
+try {
+    $app->handleRequest(Request::capture());
+    echo "After handleRequest (should not appear)\n";
+} catch (Throwable $e) {
+    echo "Exception: " . $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
+}
