@@ -53,10 +53,22 @@ if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php'
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+try {
+    $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-if (isset($storagePath)) {
-    $app->useStoragePath($storagePath);
+    if (isset($storagePath)) {
+        $app->useStoragePath($storagePath);
+    }
+
+    $app->handleRequest(Request::capture());
+} catch (Throwable $e) {
+    error_log('Laravel 500: ' . (string) $e);
+
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/plain; charset=utf-8');
+    }
+
+    echo "ERROR: " . $e->getMessage() . "\n";
+    echo "FILE: " . $e->getFile() . ":" . $e->getLine() . "\n";
 }
-
-$app->handleRequest(Request::capture());
