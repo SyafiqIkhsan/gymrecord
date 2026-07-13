@@ -1,14 +1,13 @@
 <?php
 
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', '0');
 ini_set('log_errors', '1');
 
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Tangkap fatal error
 register_shutdown_function(function () {
     $error = error_get_last();
     if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
@@ -16,10 +15,6 @@ register_shutdown_function(function () {
         header('Content-Type: text/plain');
         echo "FATAL: {$error['message']} in {$error['file']}:{$error['line']}\n";
     }
-});
-
-set_error_handler(function ($severity, $message, $file, $line) {
-    throw new \ErrorException($message, 0, $severity, $file, $line);
 });
 
 try {
