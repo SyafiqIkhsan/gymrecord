@@ -22,6 +22,7 @@ try {
         $tmpDir = sys_get_temp_dir();
         $storagePath = $tmpDir . '/laravel-storage';
 
+        putenv('APP_DEBUG=1');
         putenv('APP_CONFIG_CACHE=' . $tmpDir . '/config.php');
         putenv('APP_EVENTS_CACHE=' . $tmpDir . '/events.php');
         putenv('APP_PACKAGES_CACHE=' . $tmpDir . '/packages.php');
