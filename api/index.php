@@ -1,8 +1,10 @@
 <?php
 
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', '0');
 ini_set('log_errors', '1');
+
+use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
@@ -45,21 +47,16 @@ if (getenv('VERCEL')) {
     }
 }
 
+if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
 require __DIR__ . '/../vendor/autoload.php';
+
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
 if (isset($storagePath)) {
     $app->useStoragePath($storagePath);
 }
 
-echo "Before handleRequest\n";
-
-use Illuminate\Http\Request;
-
-try {
-    $app->handleRequest(Request::capture());
-    echo "After handleRequest (should not appear)\n";
-} catch (Throwable $e) {
-    echo "Exception: " . $e->getMessage() . "\n";
-    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
-}
+$app->handleRequest(Request::capture());
