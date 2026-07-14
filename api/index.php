@@ -60,8 +60,11 @@ try {
     if (getenv('VERCEL')) {
         try {
             $artisan = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+            ob_start();
             $artisan->call('migrate', ['--force' => true]);
+            ob_end_clean();
         } catch (\Throwable $e) {
+            ob_end_clean();
             error_log('Auto-migrate error: ' . $e->getMessage());
         }
     }
