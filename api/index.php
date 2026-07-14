@@ -22,6 +22,7 @@ try {
         $tmpDir = sys_get_temp_dir();
         $storagePath = $tmpDir . '/laravel-storage';
 
+        putenv('APP_DEBUG=1');
         putenv('APP_CONFIG_CACHE=' . $tmpDir . '/config.php');
         putenv('APP_EVENTS_CACHE=' . $tmpDir . '/events.php');
         putenv('APP_PACKAGES_CACHE=' . $tmpDir . '/packages.php');
@@ -56,15 +57,15 @@ try {
 
     // Auto-run migrations on Vercel jika tabel belum ada
     if (getenv('VERCEL')) {
-    try {
-        $artisan = $app->make(\Illuminate\Contracts\Console\Kernel::class);
-        $artisan->call('migrate', ['--force' => true]);
-    } catch (\Throwable $e) {
-        error_log('Auto-migrate error: ' . $e->getMessage());
+        try {
+            $artisan = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+            $artisan->call('migrate', ['--force' => true]);
+        } catch (\Throwable $e) {
+            error_log('Auto-migrate error: ' . $e->getMessage());
+        }
     }
-}
 
-$app->handleRequest(Request::capture());
+    $app->handleRequest(Request::capture());
 } catch (Throwable $e) {
     error_log('Laravel 500: ' . (string) $e);
 
