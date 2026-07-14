@@ -24,6 +24,7 @@ try {
 
         putenv('APP_DEBUG=1');
         putenv('DB_CONNECTION=mysql');
+        putenv('SESSION_DRIVER=file');
         putenv('APP_CONFIG_CACHE=' . $tmpDir . '/config.php');
         putenv('APP_EVENTS_CACHE=' . $tmpDir . '/events.php');
         putenv('APP_PACKAGES_CACHE=' . $tmpDir . '/packages.php');
