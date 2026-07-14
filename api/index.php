@@ -22,19 +22,12 @@ try {
         $tmpDir = sys_get_temp_dir();
         $storagePath = $tmpDir . '/laravel-storage';
 
-        putenv('APP_DEBUG=1');
         putenv('APP_CONFIG_CACHE=' . $tmpDir . '/config.php');
         putenv('APP_EVENTS_CACHE=' . $tmpDir . '/events.php');
         putenv('APP_PACKAGES_CACHE=' . $tmpDir . '/packages.php');
         putenv('APP_ROUTES_CACHE=' . $tmpDir . '/routes.php');
         putenv('APP_SERVICES_CACHE=' . $tmpDir . '/services.php');
         putenv('VIEW_COMPILED_PATH=' . $storagePath . '/framework/views');
-
-        $dbPath = $tmpDir . '/database.sqlite';
-        if (!file_exists($dbPath)) {
-            touch($dbPath);
-        }
-        putenv('DB_DATABASE=' . $dbPath);
 
         foreach (['app/public', 'framework/cache/data', 'framework/sessions', 'framework/testing', 'framework/views', 'logs'] as $dir) {
             $path = $storagePath . '/' . $dir;
@@ -57,12 +50,12 @@ try {
 
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-if (isset($storagePath)) {
-    $app->useStoragePath($storagePath);
-}
+    if (isset($storagePath)) {
+        $app->useStoragePath($storagePath);
+    }
 
-// Auto-run migrations on Vercel jika tabel belum ada
-if (getenv('VERCEL')) {
+    // Auto-run migrations on Vercel jika tabel belum ada
+    if (getenv('VERCEL')) {
     try {
         $artisan = $app->make(\Illuminate\Contracts\Console\Kernel::class);
         $artisan->call('migrate', ['--force' => true]);
